@@ -26,13 +26,13 @@ class Main:
     def __init__( self ):
         self._setPID()
         self._init_vars()
+        self._delete_old_logs()
         self._create_speedfan_log()
         
                 
     def _setPID( self ):
         basetime = time.time()
         while os.path.isfile( pidfile ):
-            time.sleep( random.randint( 1, 3 ) )
             if time.time() - basetime > config.Get( 'aborttime' ):
                 err_str = 'taking too long for previous process to close - aborting attempt'
                 lw.log( [err_str] )
@@ -42,9 +42,16 @@ class Main:
         lw.log( loglines )        
 
 
+    def _delete_old_logs( self ):
+        lw.log( ['attempting to delete old log files'] )
+        logfiles = os.path.join( self.DATAROOT, 'SFLog*')
+        os.popen( 'rm ' + logfiles )
+
+
     def _init_vars( self ):
         self.DATAROOT = os.path.join( p_folderpath, 'data' )
         self.MAPPINGS = config.Get( 'mappings' )
+        lw.log( [self.MAPPINGS] )
         self.STRIPTEXT = config.Get( 'striptext' )
         self.MINLINES = config.Get( 'minlines' )
 
@@ -54,7 +61,8 @@ class Main:
         header = 'Seconds'
         data_row = '12345'
         for mapping in self.MAPPINGS:
-            output = os.popen("/opt/vc/bin/vcgencmd %s" % mapping[1]).readline().strip()
+            lw.log( ['trying vcgencmd ' + mapping[1]] )
+            output = os.popen( "/opt/vc/bin/vcgencmd %s" % mapping[1] ).readline().strip()
             lw.log( ['got %s from vcgencmd' % output] )
             num_output = replaceWords( output, self.STRIPTEXT )
             header = header + '\t' + mapping[0]
