@@ -121,6 +121,7 @@ def moveFile( src, dst ):
 
 def popenWithTimeout( command, timeout ):
     log_lines = []
+    log_lines.append( 'running command ' + command)
     if hasSubprocess:
         try:
             p = subprocess.Popen( command, stdout=subprocess.PIPE, stderr=subprocess.PIPE )
@@ -139,6 +140,7 @@ def popenWithTimeout( command, timeout ):
         log_lines.append( 'script took too long to run, terminating' )
         return False, log_lines
     else:
+        log_lines.append( 'running command with os.system' )
         os.system( command )
         return True, log_lines
 
