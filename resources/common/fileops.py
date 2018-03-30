@@ -1,4 +1,4 @@
-# v.0.4.1
+# v.0.4.2
 
 import shutil, time
 try:
